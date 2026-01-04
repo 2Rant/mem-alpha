@@ -1,4 +1,4 @@
-python memory_server.py --server_url http://localhost:8001/v1 \
+python memory_server.py --model_name gpt-4.1 \
   > server_outputs.log 2>&1 &
 
 #!/usr/bin/env bash
@@ -9,21 +9,21 @@ function_content_reward_weight=0.1
 sub_sample_question_ratio=1.0
 
 # Project and experiment configuration
-project_name='Mem-alpha'
+project_name='memagent'
 exp_name="qwen3-4b-4node-compression${compression_ratio_weight}-content${function_content_reward_weight}"
 
 # Memory-specific configurations
-export WANDB_API_KEY="your-wandb-api-key-here"
+export WANDB_API_KEY="4430766da282faa9fe96f0513f33c82449584bc9"
 export WANDB_PROJECT="${project_name}"
 export WANDB_NAME="${exp_name}"
-export BASE_MODEL='Qwen/Qwen3-4B'
+export BASE_MODEL='/mnt/afs/codes/ljl/Memory-Agent/model/Qwen3-0.6B'
 export EXPERIMENT_NAME="${exp_name}"
 
 # Data paths
-export DATA_DIR='/home/wangyu/data/memalpha'
+export DATA_DIR='/mnt/afs/codes/ljl/Mem-alpha/data/memalpha'
 export ROLLOUT_DATA_DIR="${DATA_DIR}/${exp_name}"
-TRAIN_DATA_DIR='/path/to/current_directory/data/memalpha/'
-TEST_DATA_DIR='/path/to/current_directory/data/memalpha/'
+TRAIN_DATA_DIR='/mnt/afs/codes/ljl/Mem-alpha/data/memalpha'
+TEST_DATA_DIR='/mnt/afs/codes/ljl/Mem-alpha/data/memalpha'
 
 # Algorithm parameters
 adv_estimator=grpo
@@ -52,13 +52,13 @@ val_batch_size=32
 
 # Ray configuration
 RAY_ADDRESS=${RAY_ADDRESS:-""}
-WORKING_DIR="/home/wangyu/work/Mem-alpha"
+WORKING_DIR="/mnt/afs/codes/ljl/Mem-alpha"
 RUNTIME_ENV=${RUNTIME_ENV:-"${WORKING_DIR}/verl/trainer/runtime_env.yaml"}
-NNODES=${NNODES:-${PET_NNODES:-4}}
+NNODES=${NNODES:-${PET_NNODES:-1}}
 
 # Model and checkpoint paths
 MODEL_PATH=${MODEL_PATH:-"${BASE_MODEL}"}
-CKPTS_DIR=${CKPTS_DIR:-"/home/wangyu/ckpt/${exp_name}"}
+CKPTS_DIR=${CKPTS_DIR:-"/mnt/afs/codes/ljl/Mem-alpha/ckpt/${exp_name}"}
 
 # Training parameters
 temperature=1.0
@@ -133,7 +133,7 @@ if [ "$NODE_RANK" -eq 0 ]; then
         actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
         actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
         actor_rollout_ref.rollout.name=vllm \
-        actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
+        actor_rollout_ref.rollout.gpu_memory_utilization=0.3 \
         actor_rollout_ref.rollout.temperature=${temperature} \
         actor_rollout_ref.rollout.top_p=${top_p} \
         actor_rollout_ref.rollout.top_k="${top_k}" \
@@ -145,7 +145,7 @@ if [ "$NODE_RANK" -eq 0 ]; then
         trainer.val_before_train=false \
         trainer.validation_data_dir="${ROLLOUT_DATA_DIR}/validation"\
         trainer.default_hdfs_dir=null \
-        trainer.n_gpus_per_node=8 \
+        trainer.n_gpus_per_node=2 \
         trainer.nnodes="${NNODES}" \
         trainer.save_freq=1 \
         trainer.test_freq=50 \

@@ -54,7 +54,7 @@ class MemoryGenerationManager:
         self.actor_rollout_wg = actor_rollout_wg
         self.config = config
         self.is_validation = is_validation
-        with open("/home/wangyu/work/Mem-alpha/config/prompts_wrt_datasource.yaml", "r") as f:
+        with open("/mnt/afs/codes/ljl/Mem-alpha/config/prompts_wrt_datasource.yaml", "r") as f:
             self.prompts_wrt_datasource = yaml.safe_load(f)
 
         self.tensor_fn = TensorHelper(TensorConfig(

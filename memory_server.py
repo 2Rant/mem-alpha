@@ -84,6 +84,23 @@ class MemoryProcessor:
             self.tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3-32B")
 
             logger.info(f"Initialized Qwen model client with base_url: {base_url}")
+        elif "gpt-4.1" in self.model or "gpt-4" in self.model or "gpt-3.5" in self.model:
+            # OpenAI configuration for gpt models
+            self.api_key = os.getenv("OPENAI_API_KEY")
+            self.base_url = os.getenv("OPENAI_BASE_URL")
+            if not self.api_key:
+                raise ValueError("OPENAI_API_KEY environment variable is required for OpenAI models")
+
+            self.client = OpenAI(
+                api_key=self.api_key,
+                base_url=self.base_url
+            )
+            self.model_name = self.model  # Use the model name as configured
+
+            # For OpenAI models, we don't need tokenizer as we use the API directly
+            self.tokenizer = None
+
+            logger.info(f"Initialized OpenAI client for {self.model}")
         else:
             # Azure OpenAI configuration for gpt models
             self.api_key = os.getenv("AZURE_OPENAI_API_KEY")
@@ -1716,10 +1733,22 @@ if __name__ == '__main__':
     # Initialize the processor with the server URL
     processor = MemoryProcessor(server_url=args.server_url)
 
-    # Check if required environment variables are set for Azure models
-    if MODEL_NAME != "qwen3-32b" and not os.getenv("AZURE_OPENAI_API_KEY"):
-        logger.error("AZURE_OPENAI_API_KEY environment variable is required for Azure models")
-        exit(1)
+    # Check if required environment variables are set based on model type
+    if MODEL_NAME == "qwen3-32b":
+        # Qwen model uses OpenRouter API
+        if not os.getenv("OPENROUTER_API_KEY"):
+            logger.error("OPENROUTER_API_KEY environment variable is required for Qwen models")
+            exit(1)
+    elif "gpt-4.1" in MODEL_NAME or "gpt-4" in MODEL_NAME or "gpt-3.5" in MODEL_NAME:
+        # OpenAI models use OpenAI API
+        if not os.getenv("OPENAI_API_KEY"):
+            logger.error("OPENAI_API_KEY environment variable is required for OpenAI models")
+            exit(1)
+    else:
+        # Azure models use Azure OpenAI API
+        if not os.getenv("AZURE_OPENAI_API_KEY"):
+            logger.error("AZURE_OPENAI_API_KEY environment variable is required for Azure models")
+            exit(1)
 
     # Run the server
     logger.info("Starting Memory-powered Question Answering Server...")

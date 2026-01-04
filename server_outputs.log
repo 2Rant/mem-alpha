@@ -1,0 +1,16 @@
+/mnt/afs/anaconda3/envs/memalpha/lib/python3.10/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+INFO:__main__:Initialized OpenAI client for gpt-4.1
+INFO:__main__:Starting Memory-powered Question Answering Server...
+INFO:__main__:Using model: gpt-4.1
+INFO:__main__:Model name for API calls: gpt-4.1
+INFO:__main__:Available endpoints:
+INFO:__main__:  GET  /health - Health check
+INFO:__main__:  POST /process - Process memories and questions
+INFO:__main__:  POST /batch_process - Batch process memories and questions
+INFO:__main__:  POST /agentic_process - Agentic memory search and response
+INFO:__main__:  POST /analyze_function - Analyze memory function calls for quality
+ * Serving Flask app 'memory_server'
+ * Debug mode: off
+Address already in use
+Port 5000 is in use by another program. Either identify and stop that program, or start the server with a different port.
